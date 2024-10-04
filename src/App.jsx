@@ -1,36 +1,40 @@
-import { useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
-import './App.css';
+import React, { useState } from 'react';
+import { EBoardType } from './EBoardType';
+import EditorComponent from './EditorComponent';
+import FileUpload from './FileUpload';
+import BoardTypeSelector from './BoardTypeSelector';
 
 export default function App() {
-  const editorRef = useRef(null);
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
+  const [boardType, setBoardType] = useState(EBoardType.EMPLOYMENT);
+  const [content, setContent] = useState("<p>This is the initial content of the editor.</p>");
+
+  const handleContentChange = (newContent) => {
+    setContent(newContent);
   };
+
+  const handleFileUpload = (url, type) => {
+    console.log("확인용 출력) S3에 저장된 URL", url)
+
+    setContent((prevContent) => {
+      if (type.startsWith('image/')) {
+        return prevContent + `<img src="${url}" alt="업로드한 이미지" />`;
+      } else {
+        return prevContent + `<a href="${url}" target="_blank">파일 다운로드</a>`;
+      }
+    });
+  };
+
   return (
     <>
-      <Editor
-        apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-        onInit={(_evt, editor) => editorRef.current = editor}
-        initialValue="<p>This is the initial content of the editor.</p>"
-        init={{
-          height: 500,
-          menubar: false,
-          plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-          ],
-          toolbar: 'undo redo | blocks | ' +
-            'bold italic forecolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'removeformat | help',
-          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-        }}
+      <BoardTypeSelector 
+        boardType={boardType}
+        onBoardTypeChange={setBoardType} 
       />
-      <button onClick={log}>Log editor content</button>
+      <EditorComponent 
+        content={content} 
+        onContentChange={handleContentChange} 
+      />
+      <FileUpload boardType={boardType} onFileUpload={handleFileUpload}/>
     </>
   );
 }
