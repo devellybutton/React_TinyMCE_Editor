@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EBoardType } from './EBoardType';
+import { EBoardType } from '../types/EBoardType';
 import EditorComponent from './EditorComponent';
 import FileUpload from './FileUpload';
 import BoardTypeSelector from './BoardTypeSelector';

@@ -1,4 +1,4 @@
-import { EBoardType } from "./EBoardType";
+import { EBoardType } from "../types/EBoardType";
 
 export default function BoardTypeSelector({ boardType, onBoardTypeChange }) {
     return (

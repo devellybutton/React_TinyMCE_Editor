@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from '../css/FileUpload.module.css';
 
 export default function FileUpload({ boardType, onFileUpload }) {
   const [file, setFile] = useState(null);
@@ -23,6 +24,7 @@ export default function FileUpload({ boardType, onFileUpload }) {
       return;
     }
 
+    // 1. 서버에서 presigned URL 가져오기
     const presignedResponse = await fetch('http://localhost:3000/files/presigned-url', {
       method: 'POST',
       headers: {
@@ -46,6 +48,7 @@ export default function FileUpload({ boardType, onFileUpload }) {
     });
     formData.append('file', file);
 
+    // 2. S3 버킷에 해당 파일 업로드하기
     const uploadResponse = await fetch(url, {
       method: 'POST',
       body: formData,
@@ -54,14 +57,11 @@ export default function FileUpload({ boardType, onFileUpload }) {
     if (uploadResponse.ok) {
       alert('파일이 성공적으로 업로드되었습니다!');
 
-      console.log("확인용 출력) url: ", url)
-      console.log("확인용 출력) fields: ", fields['key'])
-
       const fileUrl = `${url}${fields['key']}`;
 
-      console.log('S3 URL:', fileUrl); 
+      // console.log('S3 URL:', fileUrl); 
       
-      setUploadedFileUrl(fileUrl); // 업로드된 파일 URL 저장
+      setUploadedFileUrl(fileUrl);
       onFileUpload(fileUrl, file.type);
     } else {
       alert('파일 업로드에 실패했습니다.');
@@ -69,15 +69,15 @@ export default function FileUpload({ boardType, onFileUpload }) {
   };
 
   return (
-    <>
+    <div className={styles.container}>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleFileUpload}>S3 버킷에 파일 업로드</button>
       {uploadedFileUrl && file && file.type.startsWith('image/') && (
-        <div>
+        <div className={styles.previewBox}>
           <p>미리보기:</p>
           <img src={uploadedFileUrl} alt="미리보기" style={{ maxWidth: '300px', maxHeight: '300px' }} />
         </div>
       )}
-    </>
+    </div>
   );
 }
