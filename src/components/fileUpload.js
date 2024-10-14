@@ -2,16 +2,13 @@ import { API_FILE_URL } from '../api';
 
 const uploadFileToS3 = async (file) => {
   // 1. 서버에서 presigned URL 가져오기
-  const presignedResponse = await fetch(
-    `${API_FILE_URL}/presigned-url`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ fileType: file.type }),
-    }
-  );
+  const presignedResponse = await fetch(`${API_FILE_URL}/presigned-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fileType: file.type }),
+  });
 
   if (!presignedResponse.ok) {
     throw new Error('Presigned URL을 가져오는 데 오류가 발생하였습니다.');

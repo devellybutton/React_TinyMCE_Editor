@@ -1,5 +1,5 @@
 {
-  "name": "React_Tinymce",
+  "name": "React_TinyMCE",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tinymce/tinymce-react": "^5.1.1",
+    "browser-image-compression": "^2.0.2",
     "dotenv": "^16.4.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

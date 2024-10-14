@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import uploadFileToS3 from './fileUpload';
 import UploadedFiles from './UploadedFiles';
+import compressImage from '../utils/compress-image';
 
 export default function EditorComponent({ content, onContentChange }) {
   const editorRef = useRef(null);
@@ -67,13 +68,15 @@ export default function EditorComponent({ content, onContentChange }) {
 
             input.addEventListener('change', async (e) => {
               const file = e.target.files[0];
-              const reader = new FileReader();
 
-              reader.onload = function () {
-                cb(reader.result, { title: 'hola' });
-              };
               if (file) {
                 try {
+                  // 이미지 파일이면 압축
+                  let compressedFile;
+                  if (file.type.startsWith('image/')) {
+                    compressedFile = await compressImage(file);
+                  }
+
                   // S3에 파일 업로드 및 URL 획득
                   const fileUrl = await handleFileUpload(file);
 
@@ -92,7 +95,7 @@ export default function EditorComponent({ content, onContentChange }) {
                     console.error('파일 URL이 유효하지 않습니다.');
                   }
                 } catch (error) {
-                  console.error('파일 업로드 중 오류 발생:', error); 
+                  console.error('파일 업로드 중 오류 발생:', error);
                   alert(error.message);
                 }
               } else {
