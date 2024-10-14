@@ -1,0 +1,12 @@
+.uploadedFilesContainer {
+  margin-top: 20px;
+}
+
+.uploadedFilesContainer ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.uploadedFilesContainer li {
+  margin: 5px 0;
+}

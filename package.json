@@ -1,5 +1,5 @@
 {
-  "name": "tinymce-react-demo",
+  "name": "React_Tinymce",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@tinymce/tinymce-react": "^5.1.1",
