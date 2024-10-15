@@ -21,8 +21,14 @@ export default function App() {
     setFileUrls((prev) => [...prev, url]);
   };
 
+  const handleFileDelete = (url) => {
+    setFileUrls((prev) => prev.filter((fileUrl) => fileUrl !== url));
+  };
+
   const handlePostSubmit = async () => {
-    const hospitalArray = hospitalNames ? hospitalNames.split(',').map((name) => name.trim()) : null;
+    const hospitalArray = typeof hospitalNames === 'string' && hospitalNames.length > 0
+      ? hospitalNames.split(',').map((name) => name.trim())
+      : [];
 
     const requestBody = {
       title,
@@ -70,6 +76,8 @@ export default function App() {
         content={content}
         onContentChange={handleContentChange}
         onFileUpload={handleFileUpload}
+        onFileDelete={handleFileDelete}
+        fileUrls={fileUrls}
       />
       <FileUpload boardType={boardType} onFileUpload={handleFileUpload} />
     </>
