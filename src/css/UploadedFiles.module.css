@@ -10,3 +10,18 @@
 .uploadedFilesContainer li {
   margin: 5px 0;
 }
+
+.uploadedFilesContainer {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.fileItem {
+  background-color: #e0e0e0;
+  padding: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

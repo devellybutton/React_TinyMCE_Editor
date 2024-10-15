@@ -17,7 +17,7 @@ export default function App() {
     setContent(newContent);
   };
 
-  // 사용자가 직접 html의 input 태그로 업로드한 경우
+  // 사용자가 직접 html의 input 태그로 업로드한 경우 (현재 미사용)
   const handleFileUpload = (url, type) => {
     console.log('확인용) S3에 저장된 URL: ', url);
 
@@ -35,12 +35,19 @@ export default function App() {
   };
 
   const handlePostSubmit = async () => {
+    const hospitalArray = hospitalNames.split(',').map((name) => name.trim());
+
     const requestBody = {
       title,
       content,
       fileUrls,
-      hospitalNames,
+      hospitalNames: hospitalArray,
     };
+
+    console.log('Title:', title);
+    console.log('Content:', content);
+    console.log('File URLs:', fileUrls);
+    console.log('Hospital Names:', hospitalNames);
 
     console.log('Request body 내용:', requestBody);
     console.log('Request body size:', JSON.stringify(requestBody).length);
@@ -61,18 +68,16 @@ export default function App() {
 
   return (
     <>
-      <button onClick={() => handlePostSubmit(title, hospitalNames)}>
-        게시물 작성
-      </button>
+      <button onClick={handlePostSubmit}>게시물 작성</button>
       <BoardTypeSelector
         boardType={boardType}
         onBoardTypeChange={setBoardType}
       />
       <PostInput
-        onSubmit={(newTitle, newHospitalNames) => {
-          setTitle(newTitle);
-          setHospitalNames(newHospitalNames);
-        }}
+        title={title}
+        setTitle={setTitle}
+        hospitalNames={hospitalNames}
+        setHospitalNames={setHospitalNames}
       />
       <EditorComponent
         content={content}

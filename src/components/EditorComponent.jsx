@@ -3,6 +3,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import uploadFileToS3 from './fileUpload';
 import UploadedFiles from './UploadedFiles';
 import compressImage from '../utils/compress-image';
+import { API_FILE_URL } from '../api';
 
 export default function EditorComponent({ content, onContentChange }) {
   const editorRef = useRef(null);
@@ -20,6 +21,31 @@ export default function EditorComponent({ content, onContentChange }) {
     } catch (error) {
       alert(error.message);
       return null;
+    }
+  };
+
+  const handleFileDelete = async (file) => {
+    try {
+      const encodedFileURL = encodeURIComponent(file.url);
+      await fetch(`${API_FILE_URL}/${encodedFileURL}`, {
+        method: 'DELETE',
+      });
+
+      setUploadedFiles((prevFiles) =>
+        prevFiles.filter((item) => item.url !== file.url)
+      );
+
+      // 에디터 내용에서 해당 이미지 삭제
+      const currentContent = editorRef.current.getContent();
+      const newContent = currentContent.replace(
+        `<img src="${file.url}" alt="${file.name}" />`,
+        ''
+      );
+      editorRef.current.setContent(newContent);
+      onContentChange(newContent);
+    } catch (error) {
+      console.error('파일 삭제 중 오류 발생:', error);
+      alert('파일 삭제에 실패했습니다.');
     }
   };
 
@@ -112,12 +138,29 @@ export default function EditorComponent({ content, onContentChange }) {
             editor.on('change', () => {
               const newContent = editor.getContent();
               onContentChange(newContent);
+
+              // 이미지 태그를 찾아서 삭제된 이미지 처리
+              const imgTags = [...editor.getBody().querySelectorAll('img')];
+              const currentFileUrls = uploadedFiles.map((file) => file.url);
+
+              // 현재 업로드된 파일 URL을 배열로 저장
+              const currentImageUrls = imgTags.map((img) => img.src);
+
+              // 삭제된 이미지 URL 확인
+              const deletedImageUrls = currentFileUrls.filter(
+                (url) => !currentImageUrls.includes(url)
+              );
+
+              // 삭제된 이미지를 파일 목록에서 제거
+              setUploadedFiles((prevFiles) =>
+                prevFiles.filter((file) => !deletedImageUrls.includes(file.url))
+              );
             });
           },
         }}
       />
       {/* 업로드한 파일 목록 표시 */}
-      <UploadedFiles files={uploadedFiles} />
+      <UploadedFiles files={uploadedFiles} onDelete={handleFileDelete} />
     </>
   );
 }

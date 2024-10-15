@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '../css/UploadedFiles.module.css';
 
-const UploadedFiles = ({ files }) => {
+const UploadedFiles = ({ files, onDelete }) => {
   const totalSize = files.reduce((acc, file) => acc + file.size, 0);
 
   return (
@@ -9,9 +9,10 @@ const UploadedFiles = ({ files }) => {
       <h3>업로드한 파일 목록</h3>
       <ul>
         {files.map((file, index) => (
-          <li key={index}>
+          <li key={index} className={styles.fileItem}>
             <span>{file.name}</span> -<span>{file.type}</span> -
             <span>{(file.size / 1024).toFixed(2)} KB</span>
+            <button onClick={() => onDelete(file)}>X</button>
           </li>
         ))}
       </ul>
