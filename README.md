@@ -30,3 +30,5 @@
 ---
 
 ## 🔥 시퀀스 다이어그램
+
+![image](https://github.com/user-attachments/assets/9012df20-5160-4e66-9458-1fe6c22cd3b8)
