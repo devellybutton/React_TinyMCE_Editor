@@ -5,6 +5,7 @@ import FileUpload from './FileUpload.jsx';
 import BoardTypeSelector from './BoardTypeSelector';
 import PostInput from './PostInput.jsx';
 import { createPost } from '../api/request.js';
+import styles from '../css/App.module.css';
 
 export default function App() {
   const [boardType, setBoardType] = useState(EBoardType.EMPLOYMENT);
@@ -26,9 +27,10 @@ export default function App() {
   };
 
   const handlePostSubmit = async () => {
-    const hospitalArray = typeof hospitalNames === 'string' && hospitalNames.length > 0
-      ? hospitalNames.split(',').map((name) => name.trim())
-      : [];
+    const hospitalArray =
+      typeof hospitalNames === 'string' && hospitalNames.length > 0
+        ? hospitalNames.split(',').map((name) => name.trim())
+        : [];
 
     const requestBody = {
       title,
@@ -61,7 +63,11 @@ export default function App() {
 
   return (
     <>
-      <button onClick={handlePostSubmit}>게시물 작성</button>
+      <div className={styles.buttonContainer}>
+        <button className={styles.submitButton} onClick={handlePostSubmit}>
+          게시물 작성
+        </button>
+      </div>
       <BoardTypeSelector
         boardType={boardType}
         onBoardTypeChange={setBoardType}

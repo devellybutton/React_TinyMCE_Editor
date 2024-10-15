@@ -4,6 +4,7 @@ import uploadFileToS3 from './fileUpload';
 import UploadedFiles from './UploadedFiles';
 import compressImage from '../utils/compress-image';
 import { API_FILE_URL } from '../api';
+import { debounce } from 'lodash';
 
 export default function EditorComponent({
   content,
@@ -30,27 +31,31 @@ export default function EditorComponent({
     }
   };
 
-  const handleFileDelete = async (file) => {
+  const handleFileDelete = async (url) => {
     try {
-      const encodedFileURL = encodeURIComponent(file.url);
+      const encodedFileURL = encodeURIComponent(url);
       await fetch(`${API_FILE_URL}/${encodedFileURL}`, {
         method: 'DELETE',
       });
 
-      setUploadedFiles((prevFiles) =>
-        prevFiles.filter((item) => item.url !== file.url)
-      );
-
       // 에디터 내용에서 해당 이미지 삭제
-      const currentContent = editorRef.current.getContent();
+      const currentContent = content;
       const newContent = currentContent.replace(
-        `<img src="${file.url}" alt="${file.name}" />`,
+        new RegExp(`<img src="${url}" alt=".*?" />`, 'g'),
         ''
       );
+
+      // 상태 업데이트
       editorRef.current.setContent(newContent);
       onContentChange(newContent);
 
-      onFileDelete(file.url);
+      // 업로드된 파일 목록에서 제거
+      setUploadedFiles((prevFiles) =>
+        prevFiles.filter((file) => file.url !== url)
+      );
+
+      // 부모 컴포넌트에도 파일 삭제 알림
+      onFileDelete(url);
     } catch (error) {
       console.error('파일 삭제 중 오류 발생:', error);
       alert('파일 삭제에 실패했습니다.');
@@ -58,27 +63,34 @@ export default function EditorComponent({
   };
 
   useEffect(() => {
-    if (editorRef.current) {
+    if (!editorRef.current) {
+      return; // editorRef.current가 null일 경우 조기 반환
+    }
+
+    const handleChange = debounce(() => {
+      const currentContent = editorRef.current.getContent();
       const imgTags = [...editorRef.current.getBody().querySelectorAll('img')];
       const currentImageUrls = imgTags.map((img) => img.src);
 
-      // 현재 업로드된 파일 URL을 배열로 저장
-      const currentFileUrls = uploadedFiles.map((file) => file.url);
+      const deletedImageUrls = uploadedFiles
+        .map((file) => file.url)
+        .filter((url) => !currentImageUrls.includes(url));
 
-      // 삭제된 이미지 URL 확인
-      const deletedImageUrls = currentFileUrls.filter(
-        (url) => !currentImageUrls.includes(url)
-      );
+      if (deletedImageUrls.length > 0) {
+        setUploadedFiles((prevFiles) =>
+          prevFiles.filter((file) => !deletedImageUrls.includes(file.url))
+        );
 
-      // 삭제된 이미지를 파일 목록에서 제거 및 서버 요청
-      deletedImageUrls.forEach((url) => {
-        const fileToDelete = uploadedFiles.find((file) => file.url === url);
-        if (fileToDelete) {
-          handleFileDelete(fileToDelete);
-        }
-      });
-    }
-  }, [content, fileUrls]); // content가 변경될 때마다 검사
+        deletedImageUrls.forEach((url) => onFileDelete(url));
+      }
+    }, 300);
+
+    editorRef.current.on('change', handleChange);
+
+    return () => {
+      editorRef.current.off('change', handleChange);
+    };
+  }, [content, fileUrls]);
 
   return (
     <>

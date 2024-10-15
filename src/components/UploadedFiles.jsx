@@ -12,7 +12,7 @@ const UploadedFiles = ({ files, onDelete }) => {
           <li key={index} className={styles.fileItem}>
             <span>{file.name}</span> -<span>{file.type}</span> -
             <span>{(file.size / 1024).toFixed(2)} KB</span>
-            <button onClick={() => onDelete(file)}>X</button>
+            <button onClick={() => onDelete(file.url)}>X</button>
           </li>
         ))}
       </ul>

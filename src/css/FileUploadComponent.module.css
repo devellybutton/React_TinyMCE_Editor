@@ -1,0 +1,33 @@
+.fileUpload {
+  margin-top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.inputFile {
+  margin-bottom: 10px;
+}
+
+.buttonUpload {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.buttonUpload:hover {
+  background-color: #218838;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}

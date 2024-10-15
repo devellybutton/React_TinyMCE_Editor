@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import uploadFileToS3 from './fileUpload';
+import styles from '../css/FileUploadComponent.module.css';
 
 const FileUploadComponent = ({ onFileUpload }) => {
   const [file, setFile] = useState(null);
@@ -39,13 +40,21 @@ const FileUploadComponent = ({ onFileUpload }) => {
   };
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload} disabled={uploading}>
+    <div className={styles.fileUpload}>
+      <input
+        type="file"
+        className={styles.inputFile}
+        onChange={handleFileChange}
+      />
+      <button
+        className={styles.buttonUpload}
+        onClick={handleUpload}
+        disabled={uploading}
+      >
         {uploading ? '업로드 중...' : '업로드'}
       </button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+      {error && <p className={styles.error}>{error}</p>}
+      {successMessage && <p className={styles.success}>{successMessage}</p>}
     </div>
   );
 };
