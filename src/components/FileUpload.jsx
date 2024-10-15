@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import uploadFileToS3 from './fileUpload';
 
-const FileUploadComponent = () => {
+const FileUploadComponent = ({ onFileUpload }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
@@ -11,7 +11,7 @@ const FileUploadComponent = () => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
     if (selectedFile) {
-      setError(null); // 파일이 선택되면 에러 메시지를 지움
+      setError(null);
     } else {
       setFile(null);
     }
@@ -30,6 +30,7 @@ const FileUploadComponent = () => {
     try {
       const fileUrl = await uploadFileToS3(file);
       setSuccessMessage(`업로드 성공: ${fileUrl}`);
+      onFileUpload(fileUrl);
     } catch (err) {
       setError(err.message);
     } finally {

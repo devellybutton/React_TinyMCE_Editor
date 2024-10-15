@@ -5,7 +5,11 @@ import UploadedFiles from './UploadedFiles';
 import compressImage from '../utils/compress-image';
 import { API_FILE_URL } from '../api';
 
-export default function EditorComponent({ content, onContentChange }) {
+export default function EditorComponent({
+  content,
+  onContentChange,
+  onFileUpload,
+}) {
   const editorRef = useRef(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
@@ -117,6 +121,9 @@ export default function EditorComponent({ content, onContentChange }) {
                     // 에디터의 내용을 업데이트
                     editorRef.current.setContent(newContent);
                     onContentChange(newContent);
+
+                    // URL을 App 컴포넌트의 fileUrls에 추가
+                    onFileUpload(fileUrl);
                   } else {
                     console.error('파일 URL이 유효하지 않습니다.');
                   }

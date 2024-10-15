@@ -17,25 +17,12 @@ export default function App() {
     setContent(newContent);
   };
 
-  // 사용자가 직접 html의 input 태그로 업로드한 경우 (현재 미사용)
-  const handleFileUpload = (url, type) => {
-    console.log('확인용) S3에 저장된 URL: ', url);
-
+  const handleFileUpload = (url) => {
     setFileUrls((prev) => [...prev, url]);
-
-    setContent((prevContent) => {
-      if (type.startsWith('image/')) {
-        return prevContent + `<img src="${url}" alt="업로드한 이미지" />`;
-      } else {
-        return (
-          prevContent + `<a href="${url}" target="_blank">파일 다운로드</a>`
-        );
-      }
-    });
   };
 
   const handlePostSubmit = async () => {
-    const hospitalArray = hospitalNames.split(',').map((name) => name.trim());
+    const hospitalArray = hospitalNames ? hospitalNames.split(',').map((name) => name.trim()) : null;
 
     const requestBody = {
       title,
@@ -82,6 +69,7 @@ export default function App() {
       <EditorComponent
         content={content}
         onContentChange={handleContentChange}
+        onFileUpload={handleFileUpload}
       />
       <FileUpload boardType={boardType} onFileUpload={handleFileUpload} />
     </>
