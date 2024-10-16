@@ -88,7 +88,7 @@ export default function EditorComponent({
     return () => {
       editorRef.current.off('change', handleChange);
     };
-  }, [content, fileUrls]);
+  }, [content, fileUrls, uploadedFiles]);
 
   return (
     <>

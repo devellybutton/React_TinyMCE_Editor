@@ -113,9 +113,9 @@ export default function App() {
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
         fileUrls={fileUrls}
-        editorRef={editorRef} // editorRef 전달
-        uploadedFiles={uploadedFiles} // 업로드된 파일 전달
-        setUploadedFiles={setUploadedFiles} // 파일 상태 변경 함수 전달
+        editorRef={editorRef} 
+        uploadedFiles={uploadedFiles} 
+        setUploadedFiles={setUploadedFiles}
       />
       <FileUpload boardType={boardType} onFileUpload={handleFileUpload} />
     </>
