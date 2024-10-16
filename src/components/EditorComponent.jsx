@@ -62,6 +62,7 @@ export default function EditorComponent({
     }
   };
 
+  // 게시글 에디터에서 change 이벤트 처리
   useEffect(() => {
     if (!editorRef.current) return;
 
@@ -70,6 +71,7 @@ export default function EditorComponent({
       const imgTags = [...editorRef.current.getBody().querySelectorAll('img')];
       const currentImageUrls = imgTags.map((img) => img.src);
 
+      // 삭제된 이미지 URL 확인
       const deletedImageUrls = uploadedFiles
         .map((file) => file.url)
         .filter((url) => !currentImageUrls.includes(url));
@@ -81,6 +83,10 @@ export default function EditorComponent({
 
         deletedImageUrls.forEach((url) => onFileDelete(url));
       }
+
+      // 에디터 내용 변경시 상태 업데이트
+      // 스페이스바로 이미지를 지운 후에도 이미지가 다시 나타나는 문제를 방지
+      onContentChange(currentContent);
     }, 300);
 
     editorRef.current.on('change', handleChange);
