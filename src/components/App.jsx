@@ -67,6 +67,8 @@ export default function App() {
       hospitalNames: hospitalArray,
     };
 
+    console.log('Board Type:', boardType);
+
     console.log('Title:', title);
     console.log('Content:', content);
     console.log('File URLs:', fileUrls);

@@ -9,11 +9,13 @@
   - <b>병원 이름 입력</b> : 카카오 API를 활용하여 병원 이름을 검색하고 선택
   - <b>TinyMCE 에디터 본문에 파일 업로드</b> : 추후 이미지 외 파일 업로드도 가능하게 할 예정
 
-<p align="center">
+<div align="center">
 
   ![화면 캡처 2024-10-16 111947](https://github.com/user-attachments/assets/e06d8070-ca16-4c21-8720-6a019e744427)
 
-</p>
+</div>
+
+---
 
 ## 🔥 이미지 첨부 및 삭제 기능 명세
 
@@ -88,13 +90,42 @@
 ![브라우저압축-gif](https://github.com/user-attachments/assets/05ee6299-d8b7-4b56-a7e2-143f657a868f)
 
 </details>
+<br>
+
+### 🔷 게시물 작성 API POST 요청
+
+- Path Parameter : boardType
+- Request Body : title, content, hospitalNames, fileUrls
+- userId : 10041004 (임의 설정)
+- 본래 쿠키에서 세션 ID를 추출하고, Redis에 세션 ID와 함께 저장된 userId를 MySQL에서 조회함.
+
+<details>
+<summary><i>[시연 GIF] 게시물 작성 API 호출</i></summary>
+
+![리퀘스트전송](https://github.com/user-attachments/assets/d42d90f0-57de-496c-806a-7e125154019b)
+
+</details>
+
+<details>
+<summary><i>[시연 GIF] MySQL에서 해당 게시물 내역 조회</i></summary>
+
+![리퀘스트전송후mysql](https://github.com/user-attachments/assets/cca0b279-1cc6-47d0-9010-abe54297f9c5)
+
+</details>
+<details>
+<summary><i>[시연 GIF] MySQL에 저장된 게시글 본문 내역 자세히보기</i></summary>
+
+![리퀘스트전송후mysql메모장](https://github.com/user-attachments/assets/07c98f02-2471-4fe8-b223-8638e04cd1ae)
+
+</details>
+
 
 ---
 
 ## 🔥 시퀀스 다이어그램
 
-<p align="center">
+<div align="center">
 
 ![image](https://github.com/user-attachments/assets/9012df20-5160-4e66-9458-1fe6c22cd3b8)
 
-</p>
+</div>
