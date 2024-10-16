@@ -86,6 +86,7 @@ export default function EditorComponent({
 
       // 에디터 내용 변경시 상태 업데이트
       // 스페이스바로 이미지를 지운 후에도 이미지가 다시 나타나는 문제를 방지
+      // 에디터 초기화를 잘못해서 그런지는 모르겠는데 가끔 커서가 에디터 맨 위쪽으로 이동하고, 삭제된 이미지가 리렌더링됨.
       onContentChange(currentContent);
     }, 300);
 
