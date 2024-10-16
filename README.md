@@ -100,22 +100,22 @@
 - 본래 쿠키에서 세션 ID를 추출하고, Redis에 세션 ID와 함께 저장된 userId를 MySQL에서 조회함.
 
 <details>
-<summary><i>[시연 GIF] 게시물 작성 API 호출</i></summary>
+<summary><i>[시연 GIF] 게시물 작성 API 호출 (준비중)</i></summary>
 
-![리퀘스트전송](https://github.com/user-attachments/assets/d42d90f0-57de-496c-806a-7e125154019b)
+
 
 </details>
 
 <details>
-<summary><i>[시연 GIF] MySQL에서 해당 게시물 내역 조회</i></summary>
+<summary><i>[시연 GIF] MySQL에서 해당 게시물 내역 조회 (준비중)</i></summary>
 
-![리퀘스트전송후mysql](https://github.com/user-attachments/assets/cca0b279-1cc6-47d0-9010-abe54297f9c5)
+
 
 </details>
 <details>
-<summary><i>[시연 GIF] MySQL에 저장된 게시글 본문 내역 자세히보기</i></summary>
+<summary><i>[시연 GIF] MySQL에 저장된 게시글 본문 내역 자세히보기 (준비중)</i></summary>
 
-![리퀘스트전송후mysql메모장](https://github.com/user-attachments/assets/07c98f02-2471-4fe8-b223-8638e04cd1ae)
+
 
 </details>
 
