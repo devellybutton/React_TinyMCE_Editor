@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { EBoardType } from '../types/EBoardType';
 import EditorComponent from './EditorComponent';
 import FileUpload from './FileUpload.jsx';
@@ -6,6 +6,7 @@ import BoardTypeSelector from './BoardTypeSelector';
 import PostInput from './PostInput.jsx';
 import { createPost } from '../api/request.js';
 import styles from '../css/App.module.css';
+import { API_FILE_URL } from '../api';
 
 export default function App() {
   const [boardType, setBoardType] = useState(EBoardType.EMPLOYMENT);
@@ -13,6 +14,9 @@ export default function App() {
   const [fileUrls, setFileUrls] = useState([]);
   const [title, setTitle] = useState('');
   const [hospitalNames, setHospitalNames] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+
+  const editorRef = useRef(null);
 
   const handleContentChange = (newContent) => {
     setContent(newContent);
@@ -22,8 +26,32 @@ export default function App() {
     setFileUrls((prev) => [...prev, url]);
   };
 
-  const handleFileDelete = (url) => {
-    setFileUrls((prev) => prev.filter((fileUrl) => fileUrl !== url));
+  const handleFileDelete = async (url) => {
+    try {
+      const encodedFileURL = encodeURIComponent(url);
+      await fetch(`${API_FILE_URL}/${encodedFileURL}`, { method: 'DELETE' });
+
+      // 에디터 본문에서 해당 이미지 삭제
+      const newContent = content.replace(
+        new RegExp(`<img src="${url}" alt=".*?" />`, 'g'),
+        ''
+      );
+
+      // editorRef가 null이 아닐 때만 setContent 호출
+      if (editorRef.current) {
+        editorRef.current.setContent(newContent);
+        handleContentChange(newContent);
+      } else {
+        console.error('Editor reference가 초기화되지 않았습니다.');
+      }
+
+      setUploadedFiles((prevFiles) =>
+        prevFiles.filter((file) => file.url !== url)
+      );
+    } catch (error) {
+      console.error('파일 삭제 중 오류 발생:', error);
+      alert('파일 삭제에 실패했습니다.');
+    }
   };
 
   const handlePostSubmit = async () => {
@@ -55,6 +83,7 @@ export default function App() {
         setHospitalNames([]);
         setContent('');
         setFileUrls([]);
+        setUploadedFiles([]);
       }
     } catch (error) {
       console.error('게시글 작성 중 오류:', error);
@@ -84,6 +113,9 @@ export default function App() {
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
         fileUrls={fileUrls}
+        editorRef={editorRef} // editorRef 전달
+        uploadedFiles={uploadedFiles} // 업로드된 파일 전달
+        setUploadedFiles={setUploadedFiles} // 파일 상태 변경 함수 전달
       />
       <FileUpload boardType={boardType} onFileUpload={handleFileUpload} />
     </>

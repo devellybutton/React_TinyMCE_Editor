@@ -12,10 +12,10 @@ export default function EditorComponent({
   onFileUpload,
   onFileDelete,
   fileUrls,
+  editorRef,
+  uploadedFiles,
+  setUploadedFiles,
 }) {
-  const editorRef = useRef(null);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-
   const handleFileUpload = async (file) => {
     try {
       const fileUrl = await uploadFileToS3(file);
@@ -41,9 +41,13 @@ export default function EditorComponent({
         ''
       );
 
-      // 상태 업데이트
-      editorRef.current.setContent(newContent);
-      onContentChange(newContent);
+      // editorRef가 null이 아닐 때만 setContent 호출
+      if (editorRef.current) {
+        editorRef.current.setContent(newContent);
+        onContentChange(newContent);
+      } else {
+        console.error('Editor reference is not initialized.');
+      }
 
       // 업로드된 파일 목록에서 제거
       setUploadedFiles((prevFiles) =>
@@ -123,7 +127,10 @@ export default function EditorComponent({
           file_picker_callback: (cb, value, meta) => {
             const input = document.createElement('input');
             input.setAttribute('type', 'file');
-            input.setAttribute('accept', 'image/gif, image/png, image/jpeg, image/jpg');
+            input.setAttribute(
+              'accept',
+              'image/gif, image/png, image/jpeg, image/jpg'
+            );
 
             input.addEventListener('change', async (e) => {
               const file = e.target.files[0];
@@ -137,7 +144,9 @@ export default function EditorComponent({
                   }
 
                   // S3에 파일 업로드 및 URL 획득
-                  const fileUrl = await handleFileUpload(compressedFile || file);
+                  const fileUrl = await handleFileUpload(
+                    compressedFile || file
+                  );
 
                   // URL이 유효한지 확인
                   if (fileUrl) {
@@ -165,7 +174,8 @@ export default function EditorComponent({
             input.click();
           },
           block_unsupported_drop: false,
-          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+          content_style:
+            'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           setup: (editor) => {
             editor.on('paste', async (event) => {
               const items = event.clipboardData.items;
@@ -181,11 +191,16 @@ export default function EditorComponent({
                   if (fileUrl) {
                     const currentContent = editor.getContent();
                     const parser = new DOMParser();
-                    const doc = parser.parseFromString(currentContent, 'text/html');
+                    const doc = parser.parseFromString(
+                      currentContent,
+                      'text/html'
+                    );
 
                     // base64 이미지 찾기
-                    const base64Images = doc.querySelectorAll('img[src^="data:image/"]');
-                    base64Images.forEach(img => {
+                    const base64Images = doc.querySelectorAll(
+                      'img[src^="data:image/"]'
+                    );
+                    base64Images.forEach((img) => {
                       // S3 URL로 교체
                       img.src = fileUrl;
                       img.alt = file.name;
