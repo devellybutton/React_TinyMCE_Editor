@@ -115,8 +115,8 @@ export default function App() {
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
         fileUrls={fileUrls}
-        editorRef={editorRef} 
-        uploadedFiles={uploadedFiles} 
+        editorRef={editorRef}
+        uploadedFiles={uploadedFiles}
         setUploadedFiles={setUploadedFiles}
       />
       <FileUpload boardType={boardType} onFileUpload={handleFileUpload} />

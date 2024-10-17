@@ -6,7 +6,10 @@ const compressImage = async (file) => {
 
   return new Promise((resolve, reject) => {
     img.onload = async () => {
+      // console.log(file instanceof Blob);
+      // console.log(file instanceof File);
       console.log('★★★★★★이미지 압축 전★★★★★★');
+      console.log('파일의 타입: ', file.type);
       console.log('original width: ', img.width, img.height);
       console.log('original size: ', file.size);
 
@@ -23,7 +26,20 @@ const compressImage = async (file) => {
         img.height > 1920
       ) {
         try {
-          const compressedFile = await imageCompression(file, options);
+          // 압축 전 파일을 blob으로 변환
+          let fileToCompress = file;
+          if (!(file instanceof Blob)) {
+            // 변환 전 파일의 타입을 blob에 넣어주고, 없을 경우 image/jpeg로 넣어줌.
+            fileToCompress = new Blob([file], {
+              type: `${file.type}` || 'image/jpeg',
+            });
+          }
+
+          // 파일 압축
+          const compressedFile = await imageCompression(
+            fileToCompress,
+            options
+          );
 
           // 압축 후 파일 크기 확인
           if (compressedFile.size > 10 * 1024 * 1024) {
@@ -40,7 +56,7 @@ const compressImage = async (file) => {
           compressedImg.onload = () => {
             console.log('★★★★★★이미지 압축 후★★★★★★');
             console.log(
-              'compressedFile.width: ',
+              'compressedFile의 width와 height: ',
               compressedImg.width,
               compressedImg.height
             );

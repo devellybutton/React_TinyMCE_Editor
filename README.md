@@ -3,15 +3,18 @@
 ## 🔥 개요
 
 ### 🔷 목적
+
 - TinyMCE를 활용하여 게시글 작성 기능을 구현하고, 이미지 첨부 및 삭제 기능을 설정한 후, 간단한 UI를 구성하여 프로젝트에 도입 전 데모를 진행
+
 ### 🔷 설명
+
 - 게시판 카테고리 선택, 제목 입력, 병원 이름 입력, 에디터 본문 작성(이미지 첨부 포함) 후 '작성 버튼' 클릭 시 서버로 게시글 작성 요청이 전송됨.
   - <b>병원 이름 입력</b> : 카카오 API를 활용하여 병원 이름을 검색하고 선택
   - <b>TinyMCE 에디터 본문에 파일 업로드</b> : 추후 이미지 외 파일 업로드도 가능하게 할 예정
 
 <div align="center">
 
-  ![화면 캡처 2024-10-16 111947](https://github.com/user-attachments/assets/e06d8070-ca16-4c21-8720-6a019e744427)
+![화면 캡처 2024-10-16 111947](https://github.com/user-attachments/assets/e06d8070-ca16-4c21-8720-6a019e744427)
 
 </div>
 
@@ -61,8 +64,8 @@
 - <b>에디터 하단 첨부파일 목록의 'X' 버튼에서 이미지 삭제</b>
   - 서버의 API를 통해 S3에서 해당 이미지를 삭제함.
   - 게시판 에디터에서 이미지가 삭제되고, 하단 첨부파일 목록에서도 제거됨.
-<details>
-<summary><i> [시연 GIF] 이미지 삭제 - 에디터 내 이미지 선택 후 백스페이스 누르기</i></summary>
+  <details>
+  <summary><i> [시연 GIF] 이미지 삭제 - 에디터 내 이미지 선택 후 백스페이스 누르기</i></summary>
 
 ![스페이스바눌러서삭제-gif](https://github.com/user-attachments/assets/29276bb3-eae9-4000-a4c1-f47abd5ddf2d)
 
@@ -118,7 +121,6 @@
 ![리퀘스트전송후mysql메모장](https://github.com/user-attachments/assets/07c98f02-2471-4fe8-b223-8638e04cd1ae)
 
 </details>
-
 
 ---
 
