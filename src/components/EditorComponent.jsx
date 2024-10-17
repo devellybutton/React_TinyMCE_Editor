@@ -16,29 +16,63 @@ export default function EditorComponent({
   uploadedFiles,
   setUploadedFiles,
 }) {
+  const handleEditorInit = (editor) => {
+    editorRef.current = editor;
+  };
+
+  /**
+   * 파일을 S3에 업로드하고 업로드된 파일의 S3 URL을 반환
+   * @param {File} file - 업로드할 파일
+   * @returns {Promise<string | null>} - 파일 URL 또는 오류 시 null
+   */
+
   const handleFileUpload = async (file) => {
     try {
       const fileUrl = await uploadFileToS3(file);
-      setUploadedFiles((prevFiles) => [
-        ...prevFiles,
-        { name: file.name, type: file.type, size: file.size, url: fileUrl },
-      ]);
-      return fileUrl;
+
+      if (fileUrl) {
+        const { name, type, size } = file.file;
+        setUploadedFiles((prevFiles) => [
+          ...prevFiles,
+          { name, type, size, url: fileUrl },
+        ]);
+        return fileUrl;
+      }
     } catch (error) {
       alert(error.message);
-      return null;
     }
+    return null;
   };
 
-  const updateEditorContent = (newContent) => {
+  /**
+   * 게시판 에디터의 내용을 업데이트하고 부모 컴포넌트에 변경 사항을 알림
+   * @param {string} newContent - 새 에디터 내용
+   */
+  const updateEditorContent = (newContent, fileUrl) => {
+    // HTML 태그를 제거하고 글자 수를 계산
+    const plainTextLength = newContent.replace(/<[^>]+>/g, '').length;
+
+    // 본문의 글자수가 5000자가 넘어가면 경고 알람을 전송
+    if (plainTextLength > 5000) {
+      alert('글자수는 5000자를 초과할 수 없습니다.');
+      return;
+    }
+
     if (editorRef.current) {
       editorRef.current.setContent(newContent);
       onContentChange(newContent);
+      if (fileUrl) {
+        onFileUpload(fileUrl);
+      }
     } else {
       console.log('에디터가 초기화되지 않았습니다.');
     }
   };
 
+  /**
+   * 특정 URL의 파일을 삭제하고 에디터 내용 및 상태를 업데이트함.
+   * @param {string} url - 삭제할 파일의 S3 URL
+   */
   const handleFileDelete = async (url) => {
     try {
       const encodedFileURL = encodeURIComponent(url);
@@ -46,7 +80,10 @@ export default function EditorComponent({
 
       // 에디터 내용에서 해당 이미지 삭제
       const newContent = content.replace(
-        new RegExp(`<img src="${url}" alt=".*?" />`, 'g'),
+        new RegExp(
+          `<img src="${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"[^>]*>`,
+          'g'
+        ),
         ''
       );
 
@@ -66,6 +103,10 @@ export default function EditorComponent({
     }
   };
 
+  /**
+   * 클립보드에서 이미지를 붙여넣을 때 처리하는 함수
+   * @param {ClipboardEvent} event - 붙여넣기 이벤트
+   */
   const handleImagePaste = async (event) => {
     const items = event.clipboardData.items;
     let isImageInNow = false;
@@ -88,7 +129,7 @@ export default function EditorComponent({
             fileUrl,
             file.name
           );
-          updateEditorContent(newContent);
+          updateEditorContent(newContent, fileUrl);
           onFileUpload(fileUrl);
         }
         event.preventDefault();
@@ -112,7 +153,7 @@ export default function EditorComponent({
               fileUrl,
               '외부 웹 링크에서 가져온 이미지'
             );
-            updateEditorContent(newContent);
+            updateEditorContent(newContent, fileUrl);
             onFileUpload(fileUrl);
           }
           event.preventDefault();
@@ -126,12 +167,28 @@ export default function EditorComponent({
     }
   };
 
+  /**
+   * 에디터 내용의 이미지를 S3 파일 URL로 변경하는 함수
+   * (데이터 일관성을 위해 에디터에 넣은 이미지를 모두 S3에 저장하고 html에는 S3 URL을 넣음.)
+   * @param {string} currentContent - 현재 에디터 내용
+   * @param {string} fileUrl - 새 파일 URL
+   * @param {string} altText - 이미지에 대한 alt 텍스트
+   * @returns {string} - 업데이트된 에디터 내용
+   */
   const updateImageContent = (currentContent, fileUrl, altText) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(currentContent, 'text/html');
 
+    // base64 이미지를 S3 파일 URL로 변경
     const base64Images = doc.querySelectorAll('img[src^="data:image/"]');
     base64Images.forEach((img) => {
+      img.src = fileUrl;
+      img.alt = altText;
+    });
+
+    // 외부 링크 이미지를 S3 파일 URL로 변경
+    const externalImages = doc.querySelectorAll('img[src^="http"]');
+    externalImages.forEach((img) => {
       img.src = fileUrl;
       img.alt = altText;
     });
@@ -139,7 +196,9 @@ export default function EditorComponent({
     return doc.body.innerHTML;
   };
 
-  // 게시글 에디터에서 change 이벤트 처리
+  /**
+   * 게시글 에디터에서 change 이벤트를 처리
+   */
   useEffect(() => {
     if (!editorRef.current) return;
 
@@ -178,7 +237,9 @@ export default function EditorComponent({
     <>
       <Editor
         apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-        onInit={(_evt, editor) => (editorRef.current = editor)}
+        onInit={(_evt, editor) => {
+          handleEditorInit(editor);
+        }}
         initialValue={content}
         init={{
           height: 500,
@@ -223,6 +284,11 @@ export default function EditorComponent({
             input.addEventListener('change', async (e) => {
               const file = e.target.files[0];
 
+              if (!file) {
+                console.log('파일 선택이 취소되었습니다.');
+                return; // 아무것도 하지 않고 종료
+              }
+
               if (file) {
                 try {
                   // 이미지 파일이면 압축
@@ -236,15 +302,19 @@ export default function EditorComponent({
                     compressedFile || file
                   );
 
+                  console.log('fileurl', fileUrl);
+
                   // URL이 유효한지 확인
                   if (fileUrl) {
-                    const currentContent = editorRef.current.getContent();
-                    const newContent = `${currentContent}<img src="${fileUrl}" alt="${file.name}" />`;
+                    // 모달창에 source : S3 URL, width 및 height: 자동 입력
+                    cb(fileUrl, {
+                      alt: `${compressedFile?.file?.name || '이미지.jpeg'}`,
+                      width: `${compressedFile?.width}`,
+                      height: `${compressedFile?.height}`,
+                      style: 'max-width: 80%; height: auto',
+                    });
 
-                    // 에디터의 내용을 업데이트
-                    updateEditorContent(newContent);
-
-                    // URL을 App 컴포넌트의 fileUrls에 추가
+                    // 이미지 URL 전달
                     onFileUpload(fileUrl);
                   } else {
                     console.error('파일 URL이 유효하지 않습니다.');
@@ -256,6 +326,11 @@ export default function EditorComponent({
               } else {
                 console.warn('파일이 선택되지 않았습니다.');
               }
+            });
+
+            input.addEventListener('blur', () => {
+              // 사용자가 파일 선택 대화상자를 취소한 경우 처리
+              console.log('파일 선택 대화상자가 닫혔습니다.');
             });
 
             input.click();

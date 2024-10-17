@@ -33,18 +33,15 @@ export default function App() {
 
       // 에디터 본문에서 해당 이미지 삭제
       const newContent = content.replace(
-        new RegExp(`<img src="${url}" alt=".*?" />`, 'g'),
+        new RegExp(
+          `<img src="${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"[^>]*>`,
+          'g'
+        ),
         ''
       );
 
-      // editorRef가 null이 아닐 때만 setContent 호출
-      if (editorRef.current) {
-        editorRef.current.setContent(newContent);
-        handleContentChange(newContent);
-      } else {
-        console.error('Editor reference가 초기화되지 않았습니다.');
-      }
-
+      handleContentChange(newContent);
+      setFileUrls((prevUrls) => prevUrls.filter((fileUrl) => fileUrl !== url));
       setUploadedFiles((prevFiles) =>
         prevFiles.filter((file) => file.url !== url)
       );
@@ -73,7 +70,6 @@ export default function App() {
     console.log('Content:', content);
     console.log('File URLs:', fileUrls);
     console.log('Hospital Names:', hospitalNames);
-
     console.log('Request body 내용:', requestBody);
     console.log('Request body size:', JSON.stringify(requestBody).length);
 
@@ -93,33 +89,35 @@ export default function App() {
   };
 
   return (
-    <>
-      <div className={styles.buttonContainer}>
-        <button className={styles.submitButton} onClick={handlePostSubmit}>
-          게시물 작성
-        </button>
+    <div className={styles.container}>
+      <div className={styles.innerContainer}>
+        <div className={styles.buttonContainer}>
+          <button className={styles.submitButton} onClick={handlePostSubmit}>
+            게시물 작성
+          </button>
+        </div>
+        <BoardTypeSelector
+          boardType={boardType}
+          onBoardTypeChange={setBoardType}
+        />
+        <PostInput
+          title={title}
+          setTitle={setTitle}
+          hospitalNames={hospitalNames}
+          setHospitalNames={setHospitalNames}
+        />
+        <EditorComponent
+          content={content}
+          onContentChange={handleContentChange}
+          onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
+          fileUrls={fileUrls}
+          editorRef={editorRef}
+          uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
+        />
+        <FileUpload boardType={boardType} onFileUpload={handleFileUpload} />
       </div>
-      <BoardTypeSelector
-        boardType={boardType}
-        onBoardTypeChange={setBoardType}
-      />
-      <PostInput
-        title={title}
-        setTitle={setTitle}
-        hospitalNames={hospitalNames}
-        setHospitalNames={setHospitalNames}
-      />
-      <EditorComponent
-        content={content}
-        onContentChange={handleContentChange}
-        onFileUpload={handleFileUpload}
-        onFileDelete={handleFileDelete}
-        fileUrls={fileUrls}
-        editorRef={editorRef}
-        uploadedFiles={uploadedFiles}
-        setUploadedFiles={setUploadedFiles}
-      />
-      <FileUpload boardType={boardType} onFileUpload={handleFileUpload} />
-    </>
+    </div>
   );
 }

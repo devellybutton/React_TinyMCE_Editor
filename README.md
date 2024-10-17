@@ -105,20 +105,14 @@
 <details>
 <summary><i>[시연 GIF] 게시물 작성 API 호출 (준비중)</i></summary>
 
-
-
 </details>
 
 <details>
 <summary><i>[시연 GIF] MySQL에서 해당 게시물 내역 조회 (준비중)</i></summary>
 
-
-
 </details>
 <details>
 <summary><i>[시연 GIF] MySQL에 저장된 게시글 본문 내역 자세히보기 (준비중)</i></summary>
-
-
 
 </details>
 

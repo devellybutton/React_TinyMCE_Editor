@@ -1,13 +1,17 @@
 import { API_FILE_URL } from '../api';
 
 const uploadFileToS3 = async (file) => {
+  console.log('uploadFileToS3의 file.file', file.file);
+  console.log('uploadFileToS3의 file', file);
+  const { type } = file.file;
+
   // 1. 서버에서 presigned URL 가져오기
   const presignedResponse = await fetch(`${API_FILE_URL}/presigned-url`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ fileType: file.type }),
+    body: JSON.stringify({ fileType: `${type}` }),
   });
 
   if (!presignedResponse.ok) {
@@ -18,11 +22,11 @@ const uploadFileToS3 = async (file) => {
   const { url, fields } = responseData;
 
   const formData = new FormData();
-  formData.append('Content-Type', file.type);
+  formData.append('Content-Type', type);
   Object.entries(fields).forEach(([key, value]) => {
     formData.append(key, value);
   });
-  formData.append('file', file);
+  formData.append('file', file.file);
 
   // 2. S3에 파일 업로드
   const uploadResponse = await fetch(url, {

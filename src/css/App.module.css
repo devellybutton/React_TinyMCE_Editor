@@ -16,7 +16,20 @@
 }
 
 .buttonContainer {
+  width: 100%;
   display: flex;
   justify-content: center;
   margin: 10px 0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  width: 60%;
+  margin: 0 auto;
+}
+
+.innerContainer {
+  width: 100%;
+  justify-content: center;
 }
